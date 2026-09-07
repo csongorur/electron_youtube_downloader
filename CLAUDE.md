@@ -5,9 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 - `npm start` — launch the Electron app (`electron .`).
-- `npm install` — install deps (Electron is the only one).
+- `npm run package` — build `dist/Grab-darwin-arm64/Grab.app` with `@electron/packager`. Host architecture only; add `--arch=x64` or `--arch=universal` for the others. The bundle is ad-hoc signed, so it runs on this machine but Gatekeeper will stop it on any other Mac until it is signed and notarized with a Developer ID.
 
-No test runner, linter, or build/packaging step is configured. `npm test` is still the npm placeholder and exits 1; if tests are added, replace that script rather than adding a parallel one.
+No test runner or linter is configured. `npm test` is still the npm placeholder and exits 1; if tests are added, replace that script rather than adding a parallel one.
 
 ## Architecture
 
@@ -22,7 +22,7 @@ Three files, one flow: paste a link, press Download, get an MP3 in `~/Downloads`
 
 The URL is passed to `spawn` as an argv entry, never through a shell, and is re-validated against the YouTube pattern in the main process — the renderer's check is only for the UI state. Keep both properties when changing the download path.
 
-`yt-dlp` and `ffmpeg` must be installed (Homebrew). A GUI Electron app inherits a bare `PATH`, so `main.js` resolves them from `TOOL_DIRS` and extends `PATH` for the child process; a new external tool needs the same treatment.
+`yt-dlp` and `ffmpeg` must be installed (Homebrew) — they are resolved from the host, not bundled, so a packaged `Grab.app` still needs them present on whatever Mac runs it. A GUI Electron app inherits a bare `PATH`, so `main.js` resolves them from `TOOL_DIRS` and extends `PATH` for the child process; a new external tool needs the same treatment.
 
 ## Design
 
